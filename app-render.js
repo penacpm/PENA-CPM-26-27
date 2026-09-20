@@ -240,7 +240,7 @@ function renderClasificacion(){
     </div>`;
   });
   html += `</div></div>`;
-  html += `<p class="muted" style="font-size:11px;margin:8px 0 0;">Criterios de desempate: puntos → goles → %V → GxP → alfabético</p>`;
+  html += `<p class="muted" style="font-size:11px;margin:8px 0 0;">Criterios de desempate: Puntos → Goles → %V → GxP → Alfabético</p>`;
 
   html += `<p class="muted" style="font-size:12px;margin:16px 0 8px;">Evolución de puntos</p>
     <div class="card"><canvas id="graf-evolucion" height="180"></canvas></div>`;
@@ -280,7 +280,10 @@ function renderPichichi(){
   const claves = {gf:(s)=>s.gf, gxp:(s)=>s.gxp};
   const stats = [...jugadoresConPartidos()].sort((a,b)=>{
     const va=claves[window.ordenPichichi.criterio](a), vb=claves[window.ordenPichichi.criterio](b);
-    return window.ordenPichichi.asc ? va-vb : vb-va;
+    let cmp = window.ordenPichichi.asc ? va-vb : vb-va;
+    if (cmp !== 0) return cmp;
+    if (b.gxp !== a.gxp) return b.gxp - a.gxp; // desempate 1: mejor GxP
+    return a.nombre.localeCompare(b.nombre); // desempate 2: alfabético
   });
   let html = `<div style="display:flex;gap:8px;margin-bottom:12px;">
     <select onchange="window.ordenPichichi.criterio=this.value; renderPichichi();" style="flex:1;">
@@ -309,6 +312,7 @@ function renderPichichi(){
       <span style="width:40px;text-align:right;font-weight:500;font-size:15px;">${s.gf}</span>
     </div>`;
   });
+  html += `<p class="muted" style="font-size:11px;margin:8px 0 0;">Criterios de desempate: Goles → GxP → Alfabético</p>`;
   el.innerHTML = html;
 }
 window.renderPichichi = renderPichichi;
@@ -612,7 +616,7 @@ function renderHistorico(){
     </div>`;
   });
   html += `</div></div>`;
-  html += `<p class="muted" style="font-size:11px;margin:8px 0 0;">Criterios de desempate: puntos → goles → %V → GxP → alfabético</p>`;
+  html += `<p class="muted" style="font-size:11px;margin:8px 0 0;">Criterios de desempate: Puntos → Goles → %V → GxP → Alfabético</p>`;
   el.innerHTML = html;
 }
 window.renderHistorico = renderHistorico;
