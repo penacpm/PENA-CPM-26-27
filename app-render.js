@@ -19,11 +19,19 @@ function renderInicio(){
   if (prox){
     html += `<div class="card" style="margin-bottom:14px;">
       <p class="muted" style="font-size:12px;margin:0 0 8px;">Próximo partido</p>
-      <div style="display:flex;align-items:center;gap:14px;">
-        <div class="logo-icon" style="width:40px;height:40px;">📅</div>
-        <div>
-          <p style="font-weight:500;font-size:16px;">Jornada ${prox.numero} · ${fmtFecha(prox.fecha,true)}</p>
-          <p class="secondary" style="font-size:13px;margin:4px 0 0;">📍 Pabellón Cerrillo de Maracena · 20:00</p>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div class="logo-icon" style="width:40px;height:40px;">📅</div>
+          <div>
+            <p style="font-weight:500;font-size:16px;margin:0;">Jornada ${prox.numero} · ${fmtFecha(prox.fecha,true)}</p>
+            <p class="secondary" style="font-size:13px;margin:4px 0 0;">📍 Pabellón Cerrillo de Maracena · 20:00</p>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <div class="center"><p style="font-size:18px;font-weight:500;margin:0;" id="ic-d">-</p><p class="muted" style="font-size:9px;margin:0;">días</p></div>
+          <div class="center"><p style="font-size:18px;font-weight:500;margin:0;" id="ic-h">-</p><p class="muted" style="font-size:9px;margin:0;">horas</p></div>
+          <div class="center"><p style="font-size:18px;font-weight:500;margin:0;" id="ic-m">-</p><p class="muted" style="font-size:9px;margin:0;">min</p></div>
+          <div class="center"><p style="font-size:18px;font-weight:500;margin:0;" id="ic-s">-</p><p class="muted" style="font-size:9px;margin:0;">seg</p></div>
         </div>
       </div>
     </div>`;
@@ -32,9 +40,20 @@ function renderInicio(){
   }
 
   html += `<div class="grid-3" style="margin-bottom:14px;">
-    <div class="metric"><div class="v">${lider?lider.nombre:'-'}</div><div class="l">Líder (${lider?lider.ptos:0} pts)</div></div>
-    <div class="metric"><div class="v">${pichichi?pichichi.nombre:'-'}</div><div class="l">Pichichi (${pichichi?pichichi.gf:0} G)</div></div>
-    <div class="metric" style="background:var(--success-bg);"><div class="v" style="color:var(--success);">${euros(bote)}</div><div class="l" style="color:var(--success);">Bote</div></div>
+    <div class="metric" style="background:var(--warning-bg);">
+      <div class="l" style="color:var(--warning);">Líder</div>
+      <div class="v" style="color:var(--warning);margin-top:4px;">${lider?lider.nombre:'-'}</div>
+      <div class="l" style="color:var(--warning);margin-top:2px;">${lider?lider.ptos:0} pts</div>
+    </div>
+    <div class="metric" style="background:var(--danger-bg);">
+      <div class="l" style="color:var(--danger);">Pichichi</div>
+      <div class="v" style="color:var(--danger);margin-top:4px;">${pichichi?pichichi.nombre:'-'}</div>
+      <div class="l" style="color:var(--danger);margin-top:2px;">${pichichi?pichichi.gf:0} goles</div>
+    </div>
+    <div class="metric" style="background:var(--success-bg);">
+      <div class="l" style="color:var(--success);">Bote</div>
+      <div class="v" style="color:var(--success);margin-top:4px;">${euros(bote)}</div>
+    </div>
   </div>`;
 
   html += `<div class="card" style="margin-bottom:14px;">
@@ -61,27 +80,35 @@ function renderInicio(){
     </div>`;
   });
   el.innerHTML = html;
+  actualizarCuentaAtras('ic');
 }
 window.renderInicio = renderInicio;
 
 /* ============================================================
    RENDER: CALENDARIO
    ============================================================ */
-function actualizarCuentaAtras(){
-  const box = document.getElementById('cuenta-atras-box');
-  if (!box) return;
+function calcularCuentaAtras(){
   const prox = proximaJornada();
-  if (!prox){ box.innerHTML = '<p class="muted center">Temporada terminada</p>'; return; }
+  if (!prox) return null;
   const objetivo = new Date(prox.fecha); objetivo.setHours(20,0,0,0);
   const diff = Math.max(0, objetivo - new Date());
-  const d = Math.floor(diff/86400000);
-  const h = Math.floor((diff%86400000)/3600000);
-  const m = Math.floor((diff%3600000)/60000);
-  const s = Math.floor((diff%60000)/1000);
-  document.getElementById('ca-d').innerText = d;
-  document.getElementById('ca-h').innerText = String(h).padStart(2,'0');
-  document.getElementById('ca-m').innerText = String(m).padStart(2,'0');
-  document.getElementById('ca-s').innerText = String(s).padStart(2,'0');
+  return {
+    d: Math.floor(diff/86400000),
+    h: Math.floor((diff%86400000)/3600000),
+    m: Math.floor((diff%3600000)/60000),
+    s: Math.floor((diff%60000)/1000)
+  };
+}
+function actualizarCuentaAtras(prefix){
+  prefix = prefix || 'ca';
+  const elD = document.getElementById(prefix+'-d');
+  if (!elD) return;
+  const c = calcularCuentaAtras();
+  if (!c) return;
+  document.getElementById(prefix+'-d').innerText = c.d;
+  document.getElementById(prefix+'-h').innerText = String(c.h).padStart(2,'0');
+  document.getElementById(prefix+'-m').innerText = String(c.m).padStart(2,'0');
+  document.getElementById(prefix+'-s').innerText = String(c.s).padStart(2,'0');
 }
 window.actualizarCuentaAtras = actualizarCuentaAtras;
 
@@ -142,7 +169,7 @@ function renderCalendario(){
   });
 
   el.innerHTML = html;
-  actualizarCuentaAtras();
+  actualizarCuentaAtras('ca');
 }
 window.renderCalendario = renderCalendario;
 
