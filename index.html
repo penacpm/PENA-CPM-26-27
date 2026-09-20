@@ -209,8 +209,9 @@ window.dbGuardarMovimientoContabilidad = (idExplicito, data) => {
   return addDoc(contabilidadCol, data);
 };
 window.dbBorrarMovimientoContabilidad = (id) => deleteDoc(doc(contabilidadCol, id));
-window.dbGuardarHistorico = (temporada, data) => setDoc(doc(historicoCol, temporada), data);
-window.dbBorrarHistorico = (temporada) => deleteDoc(doc(historicoCol, temporada));
+const idDoc = (t) => t.replace(/\//g, '-');
+window.dbGuardarHistorico = (temporada, data) => setDoc(doc(historicoCol, idDoc(temporada)), data);
+window.dbBorrarHistorico = (temporada) => deleteDoc(doc(historicoCol, idDoc(temporada)));
 
 onSnapshot(jugadoresCol, (snap) => {
   const lista = [];
