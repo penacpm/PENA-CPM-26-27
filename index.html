@@ -474,7 +474,10 @@ function cerrarSesionAdmin(){ window.logoutAdminFirebase(); }
 window.cerrarSesionAdmin = cerrarSesionAdmin;
 
 /* Contador en vivo para la sección Calendario */
-setInterval(()=>{ if (document.getElementById('calendario').classList.contains('active')) window.actualizarCuentaAtras && window.actualizarCuentaAtras(); }, 1000);
+setInterval(()=>{
+  if (document.getElementById('calendario').classList.contains('active')) window.actualizarCuentaAtras && window.actualizarCuentaAtras('ca');
+  if (document.getElementById('inicio').classList.contains('active')) window.actualizarCuentaAtras && window.actualizarCuentaAtras('ic');
+}, 1000);
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
