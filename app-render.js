@@ -971,9 +971,15 @@ async function importarHistoricoPegado(){
     if (j) jugadores.push(j);
   });
   if (jugadores.length === 0){ msg.innerText = '❌ No se ha podido leer ninguna fila. Revisa el formato.'; return; }
-  await window.dbGuardarHistorico(temporada, {temporada, jugadores});
-  msg.innerText = `✅ ${jugadores.length} jugadores importados a la temporada ${temporada}.`;
-  document.getElementById('hist-pegado').value = '';
+  msg.innerText = 'Guardando...';
+  try {
+    await window.dbGuardarHistorico(temporada, {temporada, jugadores});
+    msg.innerText = `✅ ${jugadores.length} jugadores importados a la temporada ${temporada}.`;
+    document.getElementById('hist-pegado').value = '';
+  } catch (err) {
+    msg.innerText = '❌ Error al guardar: ' + (err && err.message ? err.message : err);
+    console.error('Error guardando histórico:', err);
+  }
 }
 window.importarHistoricoPegado = importarHistoricoPegado;
 async function archivarHistoricoActual(){
@@ -983,12 +989,21 @@ async function archivarHistoricoActual(){
     nombre:s.nombre, pj:s.pj, pg:s.pg, pe:s.pe, pp:s.pp, gf:s.gf, autogoles:s.autog, ptos:s.ptos,
     pv: Math.round(s.pv*100)/100, gxp: Math.round(s.gxp*100)/100
   }));
-  await window.dbGuardarHistorico('26/27', {temporada:'26/27', jugadores});
-  document.getElementById('hist-actual-msg').innerText = '✅ Clasificación actual archivada en el Histórico.';
+  const msg = document.getElementById('hist-actual-msg');
+  msg.innerText = 'Guardando...';
+  try {
+    await window.dbGuardarHistorico('26/27', {temporada:'26/27', jugadores});
+    msg.innerText = '✅ Clasificación actual archivada en el Histórico.';
+  } catch (err) {
+    msg.innerText = '❌ Error al guardar: ' + (err && err.message ? err.message : err);
+    console.error('Error archivando histórico actual:', err);
+  }
 }
 window.archivarHistoricoActual = archivarHistoricoActual;
 async function borrarHistorico(temporada){
-  if (confirm(`¿Borrar la temporada ${temporada} del Histórico?`)) await window.dbBorrarHistorico(temporada);
+  if (!confirm(`¿Borrar la temporada ${temporada} del Histórico?`)) return;
+  try { await window.dbBorrarHistorico(temporada); }
+  catch (err) { alert('❌ Error al borrar: ' + (err && err.message ? err.message : err)); console.error(err); }
 }
 window.borrarHistorico = borrarHistorico;
 
