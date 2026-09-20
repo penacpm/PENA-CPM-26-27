@@ -156,10 +156,19 @@ function ordenarLista(lista, criterio, asc){
     gxp:(s)=>s.gxp, pj:(s)=>s.pj, pg:(s)=>s.pg, pp:(s)=>s.pp, pe:(s)=>s.pe
   };
   const f = claves[criterio] || claves.ptos;
+  const cascada = [(x)=>x.ptos, (x)=>x.gf, (x)=>x.pv, (x)=>x.gxp];
+  function desempate(a,b){
+    for (const g of cascada){
+      const diff = (g(b)||0) - (g(a)||0);
+      if (diff !== 0) return diff;
+    }
+    return (a.nombre||'').localeCompare(b.nombre||'');
+  }
   const copia = [...lista].sort((a,b)=>{
     const va=f(a), vb=f(b);
-    if (typeof va === 'string') return asc ? va.localeCompare(vb) : vb.localeCompare(va);
-    return asc ? va-vb : vb-va;
+    let cmp = (typeof va === 'string') ? va.localeCompare(vb) : va-vb;
+    if (!asc) cmp = -cmp;
+    return cmp !== 0 ? cmp : desempate(a,b);
   });
   return copia;
 }
@@ -231,6 +240,7 @@ function renderClasificacion(){
     </div>`;
   });
   html += `</div></div>`;
+  html += `<p class="muted" style="font-size:11px;margin:8px 0 0;">Criterios de desempate: puntos → goles → %V → GxP → alfabético</p>`;
 
   html += `<p class="muted" style="font-size:12px;margin:16px 0 8px;">Evolución de puntos</p>
     <div class="card"><canvas id="graf-evolucion" height="180"></canvas></div>`;
@@ -602,6 +612,7 @@ function renderHistorico(){
     </div>`;
   });
   html += `</div></div>`;
+  html += `<p class="muted" style="font-size:11px;margin:8px 0 0;">Criterios de desempate: puntos → goles → %V → GxP → alfabético</p>`;
   el.innerHTML = html;
 }
 window.renderHistorico = renderHistorico;
