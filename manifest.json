@@ -1,0 +1,14 @@
+{
+  "name": "Peña CPM",
+  "short_name": "Peña CPM",
+  "description": "Dashboard de la Peña CPM de fútbol sala",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F7F7F5",
+  "theme_color": "#2a78d6",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
